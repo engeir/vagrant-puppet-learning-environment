@@ -1,0 +1,40 @@
+---
+- name: Install Puppet Server packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - https://yum.puppet.com/puppet5-release-el-7.noarch.rpm
+    - puppetserver
+    - puppetdb
+    - puppetdb-termini
+    - git
+    - tree
+- name: Enable and start Puppet Server services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - puppetserver
+    - puppetdb
+- name: Configure Puppet Server memory
+  replace:
+    path: /etc/sysconfig/puppetserver
+    regexp: '2g'
+    replace: '1g'
+- name: Configure Puppet Server settings
+  template:
+    src: templates/puppet.conf.j2
+    dest: /etc/puppetlabs/puppet/puppet.conf
+    mode: '0644'
+  notify: restart puppetserver
+- name: Set up autosign configuration
+  copy:
+    content: "*.example.com"
+    dest: /etc/puppetlabs/puppet/autosign.conf
+    mode: '0644'
+- name: Restart Puppet Server after config changes
+  service:
+    name: puppetserver
+    state: restarted

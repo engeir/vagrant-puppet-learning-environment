@@ -1,0 +1,22 @@
+---
+- name: Puppet Server Setup
+  hosts: puppet_servers
+  become: true
+  roles:
+    - puppet_server
+- name: Puppet Agent Setup
+  hosts: puppet_agents
+  become: true
+  roles:
+    - puppet_agent
+---
+- name: Puppet Server Setup
+  hosts: puppet_servers
+  become: true
+  roles:
+    - puppet_server
+- name: Puppet Agent Setup
+  hosts: puppet_agents
+  become: true
+  roles:
+    - puppet_agent

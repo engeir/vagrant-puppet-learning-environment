@@ -1,0 +1,22 @@
+---
+- name: Install Puppet Agent package
+  yum:
+    name: https://yum.puppet.com/puppet5-release-el-7.noarch.rpm
+    state: present
+- name: Install Puppet Agent
+  yum:
+    name: puppet
+    state: present
+- name: Configure Puppet Agent settings
+  template:
+    src: templates/puppet_agent.conf.j2
+    dest: /etc/puppetlabs/puppet/puppet.conf
+    mode: '0644'
+  notify: restart puppet agent
+- name: Start and enable Puppet Agent service
+  service:
+    name: puppet
+    state: started
+    enabled: yes
+- name: Run initial Puppet run
+  command: puppet agent -t

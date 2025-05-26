@@ -1,0 +1,8 @@
+[main]
+certname = {{ inventory_hostname }}
+server = {{ inventory_hostname }}
+environment = production
+runinterval = 1h
+
+[master]
+dns_alt_names = {{ inventory_hostname }}
