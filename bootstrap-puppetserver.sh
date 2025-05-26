@@ -26,11 +26,11 @@ echo "dns_alt_names = puppet
 certname = puppet.example.com 
 server = puppet.example.com
 environment = production
-runinterval = 1h" >> /etc/puppetlabs/puppet/puppet.conf
+runinterval = 1h" >>/etc/puppetlabs/puppet/puppet.conf
 
 # enable auto-sign of agents
 touch /etc/puppetlabs/puppet/autosign.conf
-echo "*.example.com" > "$PUPPETLABS/puppet/autosign.conf"
+echo "*.example.com" >"$PUPPETLABS/puppet/autosign.conf"
 
 # start puppetserver
 systemctl start puppetserver

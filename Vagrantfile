@@ -12,43 +12,42 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  
 
   # Default VM values
-  config.vm.provider "libvirt" do |v|    
+  config.vm.provider("libvirt") do |v|
     v.cpus = 2
   end
 
-  config.vm.define :puppetserver do |puppetserver|
-	puppetserver.vm.box = "centos/7"
-	puppetserver.vm.hostname = "puppet.example.com"
-	puppetserver.vm.provision :shell, path: "bootstrap-puppetserver.sh"
-	puppetserver.vm.provider :libvirt do |lv|
-        	lv.memory = 3072 
-	        lv.cpus = 2
- 	end
+  config.vm.define(:puppetserver) do |puppetserver|
+    puppetserver.vm.box = "centos/7"
+    puppetserver.vm.hostname = "puppet.example.com"
+    puppetserver.vm.provision(:shell, path: "bootstrap-puppetserver.sh")
+    puppetserver.vm.provider(:libvirt) do |lv|
+      lv.memory = 3072
+      lv.cpus = 2
+    end
   end
 
-  config.vm.define :puppetagent01 do |puppetagent|
-	puppetagent.vm.box = "centos/7"
-	puppetagent.vm.hostname = "puppetagent01.example.com"
-	puppetagent.vm.provision :shell, path: "bootstrap-puppetagent.sh"
-	puppetagent.vm.provider :libvirt do |lv|
-                lv.memory = 1024
-                lv.cpus = 2
-        end
+  config.vm.define(:puppetagent01) do |puppetagent|
+    puppetagent.vm.box = "centos/7"
+    puppetagent.vm.hostname = "puppetagent01.example.com"
+    puppetagent.vm.provision(:shell, path: "bootstrap-puppetagent.sh")
+    puppetagent.vm.provider(:libvirt) do |lv|
+      lv.memory = 1024
+      lv.cpus = 2
+    end
   end
 
-  config.vm.define :puppetagent02 do |puppetagent|
-        puppetagent.vm.box = "centos/7"
-        puppetagent.vm.hostname = "puppetagent02.example.com"
-        puppetagent.vm.provision :shell, path: "bootstrap-puppetagent.sh"
-        puppetagent.vm.provider :libvirt do |lv|
-                lv.memory = 1024
-                lv.cpus = 2
-        end
+  config.vm.define(:puppetagent02) do |puppetagent|
+    puppetagent.vm.box = "centos/7"
+    puppetagent.vm.hostname = "puppetagent02.example.com"
+    puppetagent.vm.provision(:shell, path: "bootstrap-puppetagent.sh")
+    puppetagent.vm.provider(:libvirt) do |lv|
+      lv.memory = 1024
+      lv.cpus = 2
+    end
   end
-  
+
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
@@ -79,32 +78,31 @@ Vagrant.configure("2") do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-  config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.synced_folder "./puppet", "/etc/puppetlabs/code/environments/pbg"
-  config.vm.synced_folder "./examples", "/examples"
-
-
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
-
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   apt-get update
-  #   apt-get install -y apache2
-  # SHELL
-  #
+  config.vm.synced_folder(".", "/vagrant", disabled: true)
+  config.vm.synced_folder("./puppet", "/etc/puppetlabs/code/environments/pbg")
+  config.vm.synced_folder("./examples", "/examples")
 end
+
+# Provider-specific configuration so you can fine-tune various
+# backing providers for Vagrant. These expose provider-specific options.
+# Example for VirtualBox:
+#
+# config.vm.provider "virtualbox" do |vb|
+#   # Display the VirtualBox GUI when booting the machine
+#   vb.gui = true
+#
+#   # Customize the amount of memory on the VM:
+#   vb.memory = "1024"
+# end
+#
+# View the documentation for the provider you are using for more
+# information on available options.
+
+# Enable provisioning with a shell script. Additional provisioners such as
+# Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+# documentation for more information about their specific syntax and use.
+# config.vm.provision "shell", inline: <<-SHELL
+#   apt-get update
+#   apt-get install -y apache2
+# SHELL
+#
