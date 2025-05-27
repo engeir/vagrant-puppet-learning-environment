@@ -2,8 +2,14 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.provider("libvirt") do |v|
-    v.cpus = 2
+  # Ensure the puppet directory exists
+  puppet_dir = File.expand_path("./puppet", __dir__)
+  unless Dir.exist?(puppet_dir)
+    puts "Creating puppet directory: #{puppet_dir}"
+    Dir.mkdir(puppet_dir)
+  end
+
+  config.vm.provider("virtualbox") do |vb|
   end
 
   config.vm.provision("ansible") do |a|

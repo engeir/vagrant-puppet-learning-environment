@@ -23,6 +23,7 @@
     path: /etc/sysconfig/puppetserver
     regexp: '2g'
     replace: '1g'
+  notify: restart puppetserver
 - name: Configure Puppet Server settings
   template:
     src: templates/puppet.conf.j2
@@ -34,7 +35,3 @@
     content: "*.example.com"
     dest: /etc/puppetlabs/puppet/autosign.conf
     mode: '0644'
-- name: Restart Puppet Server after config changes
-  service:
-    name: puppetserver
-    state: restarted
