@@ -12,15 +12,8 @@ Vagrant.configure("2") do |config|
   config.vm.provider("virtualbox") do |vb|
   end
 
-  # Shell script for VirtualBox Guest Additions
-  $guest_additions_script = <<-SHELL
-#!/bin/bash
-# Update kernel and install necessary packages
-yum update -y
-yum install -y kernel-devel-$(uname -r) kernel-headers-$(uname -r) gcc make perl dkms bzip2
-
-echo "Installed kernel-devel and build tools. Vagrant will attempt to rebuild guest additions if needed."
-SHELL
+  # Configure vagrant-vbguest plugin
+  config.vbguest.auto_update = true
 
   config.vm.define(:puppetserver) do |puppetserver|
     puppetserver.vm.box = "centos/7"
@@ -29,7 +22,6 @@ SHELL
       lv.memory = 3072
       lv.cpus = 2
     end
-    puppetserver.vm.provision "shell", inline: $guest_additions_script
     puppetserver.vm.provision("ansible") do |a|
       a.playbook = "install-puppet.yml"
       a.inventory_path = "hosts.ini"
@@ -43,7 +35,6 @@ SHELL
       lv.memory = 1024
       lv.cpus = 2
     end
-    puppetagent.vm.provision "shell", inline: $guest_additions_script
     puppetagent.vm.provision("ansible") do |a|
       a.playbook = "install-puppet.yml"
       a.inventory_path = "hosts.ini"
@@ -57,7 +48,6 @@ SHELL
       lv.memory = 1024
       lv.cpus = 2
     end
-    puppetagent.vm.provision "shell", inline: $guest_additions_script
     puppetagent.vm.provision("ansible") do |a|
       a.playbook = "install-puppet.yml"
       a.inventory_path = "hosts.ini"
