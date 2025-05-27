@@ -1,19 +1,28 @@
 ---
-- name: Download Puppet 6 release package for Focal
-  ansible.legacy.get_url:
-    url: https://apt.puppetlabs.com/puppet6-release-focal.deb
-    dest: /tmp/puppet6-release-focal.deb
+- name: Add Puppet GPG key
+  ansible.builtin.apt_key:
+    url: https://apt.puppet.com/DEB-GPG-KEY-puppet-20250406
+    state: present
+  become: true
+
+- name: Download Puppet 7 release package for Focal
+  get_url:
+    url: https://apt.puppetlabs.com/puppet7-release-focal.deb
+    dest: /tmp/puppet7-release-focal.deb
     mode: '0644'
-- name: Install Puppet 6 release package for Focal
-  ansible.legacy.apt:
-    deb: /tmp/puppet6-release-focal.deb
+
+- name: Install Puppet 7 release package for Focal
+  apt:
+    deb: /tmp/puppet7-release-focal.deb
   become: true
+
 - name: Update apt cache
-  ansible.legacy.apt:
-    update_cache: true
+  apt:
+    update_cache: yes
   become: true
+
 - name: Install Puppet Server and supporting packages
-  ansible.legacy.apt:
+  apt:
     name: "{{ item }}"
     state: present
   with_items:
@@ -23,16 +32,17 @@
     - git
     - tree
   become: true
+
 - name: Enable and start Puppet Server services
-  ansible.legacy.service:
+  service:
     name: "{{ item }}"
     state: started
-    enabled: true
+    enabled: yes
   with_items:
     - puppetserver
     - puppetdb
 - name: Configure Puppet Server memory
-  ansible.legacy.replace:
+  replace:
     path: /etc/default/puppetserver
     # This regex looks for -Xm[sx]<digits>g (e.g., -Xms2g or -Xmx4g)
     # and changes the <digits> part to 1, effectively setting it to 1g.
@@ -41,13 +51,13 @@
     replace: '\11g'
   notify: restart puppetserver
 - name: Configure Puppet Server settings
-  ansible.legacy.template:
+  template:
     src: templates/puppet.conf.j2
     dest: /etc/puppetlabs/puppet/puppet.conf
     mode: '0644'
   notify: restart puppetserver
 - name: Set up autosign configuration
-  ansible.legacy.copy:
+  copy:
     content: "*.example.com"
     dest: /etc/puppetlabs/puppet/autosign.conf
     mode: '0644'

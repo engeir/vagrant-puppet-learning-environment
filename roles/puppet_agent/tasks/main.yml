@@ -1,34 +1,42 @@
 ---
-- name: Download Puppet 6 release package for Focal (Agent)
-  ansible.legacy.get_url:
-    url: https://apt.puppetlabs.com/puppet6-release-focal.deb
-    dest: /tmp/puppet6-release-focal.deb
+- name: Add Puppet GPG key (Agent)
+  ansible.builtin.apt_key:
+    url: https://apt.puppet.com/DEB-GPG-KEY-puppet-20250406
+    state: present
+  become: true
+
+- name: Download Puppet 7 release package for Focal (Agent)
+  get_url:
+    url: https://apt.puppetlabs.com/puppet7-release-focal.deb
+    dest: /tmp/puppet7-release-focal.deb
     mode: '0644'
-- name: Install Puppet 6 release package for Focal (Agent)
-  ansible.legacy.apt:
-    deb: /tmp/puppet6-release-focal.deb
+
+- name: Install Puppet 7 release package for Focal (Agent)
+  apt:
+    deb: /tmp/puppet7-release-focal.deb
   become: true
+
 - name: Update apt cache (Agent)
-  ansible.legacy.apt:
-    update_cache: true
+  apt:
+    update_cache: yes
   become: true
+
 - name: Install Puppet Agent
-  ansible.legacy.apt:
+  apt:
     name: puppet-agent
     state: present
   become: true
+
 - name: Configure Puppet Agent settings
-  ansible.legacy.template:
+  template:
     src: templates/puppet_agent.conf.j2
     dest: /etc/puppetlabs/puppet/puppet.conf
     mode: '0644'
   notify: restart puppet agent
 - name: Start and enable Puppet Agent service
-  ansible.legacy.service:
+  service:
     name: puppet
     state: started
-    enabled: true
+    enabled: yes
 - name: Run initial Puppet run
-  ansible.legacy.command: puppet agent -t
-  register: puppet_agent_t_output
-  changed_when: puppet_agent_t_output.rc != 0
+  command: puppet agent -t
