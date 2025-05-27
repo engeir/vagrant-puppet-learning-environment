@@ -1,22 +1,19 @@
 ---
-- name: Download Puppet 5 release package for Focal
-  get_url:
-    url: https://apt.puppetlabs.com/puppet5-release-focal.deb
-    dest: /tmp/puppet5-release-focal.deb
+- name: Download Puppet 6 release package for Focal
+  ansible.legacy.get_url:
+    url: https://apt.puppetlabs.com/puppet6-release-focal.deb
+    dest: /tmp/puppet6-release-focal.deb
     mode: '0644'
-
-- name: Install Puppet 5 release package for Focal
-  apt:
-    deb: /tmp/puppet5-release-focal.deb
+- name: Install Puppet 6 release package for Focal
+  ansible.legacy.apt:
+    deb: /tmp/puppet6-release-focal.deb
   become: true
-
 - name: Update apt cache
-  apt:
-    update_cache: yes
+  ansible.legacy.apt:
+    update_cache: true
   become: true
-
 - name: Install Puppet Server and supporting packages
-  apt:
+  ansible.legacy.apt:
     name: "{{ item }}"
     state: present
   with_items:
@@ -26,17 +23,16 @@
     - git
     - tree
   become: true
-
 - name: Enable and start Puppet Server services
-  service:
+  ansible.legacy.service:
     name: "{{ item }}"
     state: started
-    enabled: yes
+    enabled: true
   with_items:
     - puppetserver
     - puppetdb
 - name: Configure Puppet Server memory
-  replace:
+  ansible.legacy.replace:
     path: /etc/default/puppetserver
     # This regex looks for -Xm[sx]<digits>g (e.g., -Xms2g or -Xmx4g)
     # and changes the <digits> part to 1, effectively setting it to 1g.
@@ -45,13 +41,13 @@
     replace: '\11g'
   notify: restart puppetserver
 - name: Configure Puppet Server settings
-  template:
+  ansible.legacy.template:
     src: templates/puppet.conf.j2
     dest: /etc/puppetlabs/puppet/puppet.conf
     mode: '0644'
   notify: restart puppetserver
 - name: Set up autosign configuration
-  copy:
+  ansible.legacy.copy:
     content: "*.example.com"
     dest: /etc/puppetlabs/puppet/autosign.conf
     mode: '0644'
