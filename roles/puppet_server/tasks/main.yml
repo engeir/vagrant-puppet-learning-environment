@@ -1,15 +1,32 @@
 ---
-- name: Install Puppet Server packages
+- name: Download Puppet 5 release package for Focal
+  get_url:
+    url: https://apt.puppetlabs.com/puppet5-release-focal.deb
+    dest: /tmp/puppet5-release-focal.deb
+    mode: '0644'
+
+- name: Install Puppet 5 release package for Focal
+  apt:
+    deb: /tmp/puppet5-release-focal.deb
+  become: true
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: true
+
+- name: Install Puppet Server and supporting packages
   apt:
     name: "{{ item }}"
     state: present
   with_items:
-    - puppet
     - puppetserver
     - puppetdb
     - puppetdb-termini
     - git
     - tree
+  become: true
+
 - name: Enable and start Puppet Server services
   service:
     name: "{{ item }}"
@@ -20,9 +37,12 @@
     - puppetdb
 - name: Configure Puppet Server memory
   replace:
-    path: /etc/sysconfig/puppetserver
-    regexp: '2g'
-    replace: '1g'
+    path: /etc/default/puppetserver
+    # This regex looks for -Xm[sx]<digits>g (e.g., -Xms2g or -Xmx4g)
+    # and changes the <digits> part to 1, effectively setting it to 1g.
+    # This will affect both -Xms and -Xmx if they are present and match the pattern.
+    regexp: '(-Xm[sx])([0-9]+)g'
+    replace: '\11g'
   notify: restart puppetserver
 - name: Configure Puppet Server settings
   template:

@@ -1,12 +1,26 @@
 ---
-# - name: Install Puppet Agent package
-#   apt:
-#     name: puppet
-#     state: present
+- name: Download Puppet 5 release package for Focal (Agent)
+  get_url:
+    url: https://apt.puppetlabs.com/puppet5-release-focal.deb
+    dest: /tmp/puppet5-release-focal.deb
+    mode: '0644'
+
+- name: Install Puppet 5 release package for Focal (Agent)
+  apt:
+    deb: /tmp/puppet5-release-focal.deb
+  become: true
+
+- name: Update apt cache (Agent)
+  apt:
+    update_cache: yes
+  become: true
+
 - name: Install Puppet Agent
   apt:
-    name: puppet
+    name: puppet-agent
     state: present
+  become: true
+
 - name: Configure Puppet Agent settings
   template:
     src: templates/puppet_agent.conf.j2

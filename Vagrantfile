@@ -14,6 +14,7 @@ Vagrant.configure("2") do |config|
 
   # Configure vagrant-vbguest plugin
   config.vbguest.auto_update = true
+  config.vbguest.iso_path = "http://download.virtualbox.org/virtualbox/%{version}/VBoxGuestAdditions_%{version}.iso"
 
   config.vm.define(:puppetserver) do |puppetserver|
     puppetserver.vm.box = "ubuntu/focal64"
