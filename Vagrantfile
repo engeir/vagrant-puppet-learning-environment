@@ -12,10 +12,15 @@ Vagrant.configure("2") do |config|
   config.vm.provider("virtualbox") do |vb|
   end
 
-  config.vm.provision("ansible") do |a|
-    a.playbook = "install-puppet.yml"
-    a.inventory_path = "hosts.ini"
-  end
+  # Shell script for VirtualBox Guest Additions
+  $guest_additions_script = <<-SHELL
+#!/bin/bash
+# Update kernel and install necessary packages
+yum update -y
+yum install -y kernel-devel-$(uname -r) kernel-headers-$(uname -r) gcc make perl dkms bzip2
+
+echo "Installed kernel-devel and build tools. Vagrant will attempt to rebuild guest additions if needed."
+SHELL
 
   config.vm.define(:puppetserver) do |puppetserver|
     puppetserver.vm.box = "centos/7"
@@ -23,6 +28,11 @@ Vagrant.configure("2") do |config|
     puppetserver.vm.provider(:libvirt) do |lv|
       lv.memory = 3072
       lv.cpus = 2
+    end
+    puppetserver.vm.provision "shell", inline: $guest_additions_script
+    puppetserver.vm.provision("ansible") do |a|
+      a.playbook = "install-puppet.yml"
+      a.inventory_path = "hosts.ini"
     end
   end
 
@@ -33,6 +43,11 @@ Vagrant.configure("2") do |config|
       lv.memory = 1024
       lv.cpus = 2
     end
+    puppetagent.vm.provision "shell", inline: $guest_additions_script
+    puppetagent.vm.provision("ansible") do |a|
+      a.playbook = "install-puppet.yml"
+      a.inventory_path = "hosts.ini"
+    end
   end
 
   config.vm.define(:puppetagent0_2) do |puppetagent|
@@ -42,7 +57,18 @@ Vagrant.configure("2") do |config|
       lv.memory = 1024
       lv.cpus = 2
     end
+    puppetagent.vm.provision "shell", inline: $guest_additions_script
+    puppetagent.vm.provision("ansible") do |a|
+      a.playbook = "install-puppet.yml"
+      a.inventory_path = "hosts.ini"
+    end
   end
+
+  # Global Ansible provisioner - remove if Ansible is defined per VM
+  # config.vm.provision("ansible") do |a|
+  #   a.playbook = "install-puppet.yml"
+  #   a.inventory_path = "hosts.ini"
+  # end
 
   config.vm.synced_folder("./puppet", "/etc/puppetlabs/code/environments/production")
 end
