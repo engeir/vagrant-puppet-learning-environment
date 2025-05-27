@@ -1,10 +1,10 @@
 ---
-- name: Install Puppet Agent package
-  yum:
-    name: https://yum.puppet.com/puppet5-release-el-7.noarch.rpm
-    state: present
+# - name: Install Puppet Agent package
+#   apt:
+#     name: puppet
+#     state: present
 - name: Install Puppet Agent
-  yum:
+  apt:
     name: puppet
     state: present
 - name: Configure Puppet Agent settings

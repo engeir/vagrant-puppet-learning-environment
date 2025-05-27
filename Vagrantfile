@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
   config.vbguest.auto_update = true
 
   config.vm.define(:puppetserver) do |puppetserver|
-    puppetserver.vm.box = "centos/7"
+    puppetserver.vm.box = "ubuntu/focal64"
     puppetserver.vm.hostname = "puppet.example.com"
     puppetserver.vm.provider(:libvirt) do |lv|
       lv.memory = 3072
@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define(:puppetagent0_1) do |puppetagent|
-    puppetagent.vm.box = "centos/7"
+    puppetagent.vm.box = "ubuntu/focal64"
     puppetagent.vm.hostname = "puppetagent01.example.com"
     puppetagent.vm.provider(:libvirt) do |lv|
       lv.memory = 1024
@@ -42,7 +42,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define(:puppetagent0_2) do |puppetagent|
-    puppetagent.vm.box = "centos/7"
+    puppetagent.vm.box = "ubuntu/focal64"
     puppetagent.vm.hostname = "puppetagent02.example.com"
     puppetagent.vm.provider(:libvirt) do |lv|
       lv.memory = 1024

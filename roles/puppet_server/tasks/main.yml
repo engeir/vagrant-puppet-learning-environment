@@ -1,10 +1,10 @@
 ---
 - name: Install Puppet Server packages
-  yum:
+  apt:
     name: "{{ item }}"
     state: present
   with_items:
-    - https://yum.puppet.com/puppet5-release-el-7.noarch.rpm
+    - puppet
     - puppetserver
     - puppetdb
     - puppetdb-termini
