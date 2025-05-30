@@ -1,26 +1,22 @@
 ---
-- name: Add Puppet GPG key
-  ansible.builtin.apt_key:
-    url: https://apt.puppet.com/DEB-GPG-KEY-puppet-20250406
-    state: present
-  become: true
-
+# - name: Add Puppet GPG key
+#   ansible.builtin.apt_key:
+#     url: https://apt.puppet.com/DEB-GPG-KEY-puppet-20250406
+#     state: present
+#   become: true
 - name: Download Puppet 7 release package for Focal
   get_url:
     url: https://apt.puppetlabs.com/puppet7-release-focal.deb
     dest: /tmp/puppet7-release-focal.deb
     mode: '0644'
-
 - name: Install Puppet 7 release package for Focal
   apt:
     deb: /tmp/puppet7-release-focal.deb
   become: true
-
 - name: Update apt cache
   apt:
     update_cache: yes
   become: true
-
 - name: Install Puppet Server and supporting packages
   apt:
     name: "{{ item }}"
@@ -32,24 +28,56 @@
     - git
     - tree
   become: true
-
-- name: Enable and start Puppet Server services
-  service:
-    name: "{{ item }}"
+- name: Ensure correct ownership for PuppetLabs directories
+  ansible.builtin.file:
+    path: /etc/puppetlabs
+    state: directory
+    owner: puppet
+    group: puppet
+    recurse: yes
+  become: true
+- name: Ensure puppetserver can resolve its own hostname
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "192.168.56.10 puppet.example.com puppetserver"
+    state: present
+    create: true
+  become: true
+- name: Configure PuppetDB memory
+  ansible.builtin.lineinfile:
+    path: /etc/default/puppetdb
+    regexp: '^JAVA_ARGS='
+    line: 'JAVA_ARGS="-Xmx1024m -Xms1024m"'
+    owner: root
+    group: root
+    mode: '0644'
+    create: true
+  become: true
+  notify: restart puppetdb
+- name: Enable and start puppetdb service
+  ansible.builtin.service:
+    name: puppetdb
     state: started
     enabled: yes
-  with_items:
-    - puppetserver
-    - puppetdb
+  become: true
+- name: Pause for 15 seconds to allow puppetdb to initialize
+  ansible.builtin.pause:
+    seconds: 15
 - name: Configure Puppet Server memory
   replace:
     path: /etc/default/puppetserver
     # This regex looks for -Xm[sx]<digits>g (e.g., -Xms2g or -Xmx4g)
-    # and changes the <digits> part to 1, effectively setting it to 1g.
+    # and changes the <digits> part to 2, effectively setting it to 2g.
     # This will affect both -Xms and -Xmx if they are present and match the pattern.
     regexp: '(-Xm[sx])([0-9]+)g'
-    replace: '\11g'
+    replace: '\g<1>2g' # Corrected pattern
   notify: restart puppetserver
+- name: Enable and start puppetserver service
+  ansible.builtin.service:
+    name: puppetserver
+    state: started
+    enabled: yes
+  become: true
 - name: Configure Puppet Server settings
   template:
     src: templates/puppet.conf.j2

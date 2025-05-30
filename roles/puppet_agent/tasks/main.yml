@@ -1,9 +1,9 @@
 ---
-- name: Add Puppet GPG key (Agent)
-  ansible.builtin.apt_key:
-    url: https://apt.puppet.com/DEB-GPG-KEY-puppet-20250406
-    state: present
-  become: true
+# - name: Add Puppet GPG key (Agent)
+#   ansible.builtin.apt_key:
+#     url: https://apt.puppet.com/DEB-GPG-KEY-puppet-20250406
+#     state: present
+#   become: true
 
 - name: Download Puppet 7 release package for Focal (Agent)
   get_url:
@@ -26,7 +26,13 @@
     name: puppet-agent
     state: present
   become: true
-
+# - name: Ensure puppet master is in /etc/hosts
+#   ansible.builtin.lineinfile:
+#     path: /etc/hosts
+#     line: "192.168.56.10 puppet.example.com puppet"
+#     create: true
+#     state: present
+#   become: true
 - name: Configure Puppet Agent settings
   template:
     src: templates/puppet_agent.conf.j2
@@ -39,4 +45,5 @@
     state: started
     enabled: yes
 - name: Run initial Puppet run
-  command: puppet agent -t
+  command: /opt/puppetlabs/bin/puppet agent -t
+  become: true

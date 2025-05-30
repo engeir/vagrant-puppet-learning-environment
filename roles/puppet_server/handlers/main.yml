@@ -3,3 +3,8 @@
   service:
     name: puppetserver
     state: restarted
+- name: restart puppetdb
+  ansible.builtin.service:
+    name: puppetdb
+    state: restarted
+  become: true

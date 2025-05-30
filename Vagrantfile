@@ -18,23 +18,25 @@ Vagrant.configure("2") do |config|
 
   config.vm.define(:puppetserver) do |puppetserver|
     puppetserver.vm.box = "ubuntu/focal64"
-    puppetserver.vm.hostname = "puppet.example.com"
+    puppetserver.vm.hostname = "puppetserver"
+    puppetserver.vm.network "private_network", ip: "192.168.56.10"
     puppetserver.vm.provider(:libvirt) do |lv|
-      lv.memory = 3072
+      lv.memory = 4096
       lv.cpus = 2
     end
     puppetserver.vm.provision("ansible") do |a|
       a.playbook = "install-puppet.yml"
       a.inventory_path = "hosts.ini"
       a.groups = "puppet_servers"
-      a.install = true
-      a.install_mode = "default"
+      # a.install = true
+      # a.install_mode = "default"
     end
   end
 
   config.vm.define(:puppetagent0_1) do |puppetagent|
     puppetagent.vm.box = "ubuntu/focal64"
-    puppetagent.vm.hostname = "puppetagent01.example.com"
+    puppetagent.vm.hostname = "puppetagent01"
+    puppetagent.vm.network "private_network", ip: "192.168.56.11"
     puppetagent.vm.provider(:libvirt) do |lv|
       lv.memory = 1024
       lv.cpus = 2
@@ -43,14 +45,15 @@ Vagrant.configure("2") do |config|
       a.playbook = "install-puppet.yml"
       a.inventory_path = "hosts.ini"
       a.groups = "puppet_agents"
-      a.install = true
-      a.install_mode = "default"
+      # a.install = true
+      # a.install_mode = "default"
     end
   end
 
   config.vm.define(:puppetagent0_2) do |puppetagent|
     puppetagent.vm.box = "ubuntu/focal64"
-    puppetagent.vm.hostname = "puppetagent02.example.com"
+    puppetagent.vm.hostname = "puppetagent02"
+    puppetagent.vm.network "private_network", ip: "192.168.56.12"
     puppetagent.vm.provider(:libvirt) do |lv|
       lv.memory = 1024
       lv.cpus = 2
@@ -59,8 +62,8 @@ Vagrant.configure("2") do |config|
       a.playbook = "install-puppet.yml"
       a.inventory_path = "hosts.ini"
       a.groups = "puppet_agents"
-      a.install = true
-      a.install_mode = "default"
+      # a.install = true
+      # a.install_mode = "default"
     end
   end
 
