@@ -1,12 +1,34 @@
 ---
-- name: Install Puppet Agent package
-  yum:
-    name: https://yum.puppet.com/puppet5-release-el-7.noarch.rpm
-    state: present
+# - name: Add Puppet GPG key (Agent)
+#   ansible.builtin.apt_key:
+#     url: https://apt.puppet.com/DEB-GPG-KEY-puppet-20250406
+#     state: present
+#   become: true
+- name: Download Puppet 7 release package for Focal (Agent)
+  get_url:
+    url: https://apt.puppetlabs.com/puppet7-release-focal.deb
+    dest: /tmp/puppet7-release-focal.deb
+    mode: '0644'
+- name: Install Puppet 7 release package for Focal (Agent)
+  apt:
+    deb: /tmp/puppet7-release-focal.deb
+  become: true
+- name: Update apt cache (Agent)
+  apt:
+    update_cache: yes
+  become: true
 - name: Install Puppet Agent
-  yum:
-    name: puppet
+  apt:
+    name: puppet-agent
     state: present
+  become: true
+# - name: Ensure puppet master is in /etc/hosts
+#   ansible.builtin.lineinfile:
+#     path: /etc/hosts
+#     line: "192.168.56.10 puppet.example.com puppet"
+#     create: true
+#     state: present
+#   become: true
 - name: Configure Puppet Agent settings
   template:
     src: templates/puppet_agent.conf.j2
@@ -19,4 +41,5 @@
     state: started
     enabled: yes
 - name: Run initial Puppet run
-  command: puppet agent -t
+  command: /opt/puppetlabs/bin/puppet agent -t
+  become: true
