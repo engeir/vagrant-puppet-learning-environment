@@ -4,23 +4,19 @@
 #     url: https://apt.puppet.com/DEB-GPG-KEY-puppet-20250406
 #     state: present
 #   become: true
-
 - name: Download Puppet 7 release package for Focal (Agent)
   get_url:
     url: https://apt.puppetlabs.com/puppet7-release-focal.deb
     dest: /tmp/puppet7-release-focal.deb
     mode: '0644'
-
 - name: Install Puppet 7 release package for Focal (Agent)
   apt:
     deb: /tmp/puppet7-release-focal.deb
   become: true
-
 - name: Update apt cache (Agent)
   apt:
     update_cache: yes
   become: true
-
 - name: Install Puppet Agent
   apt:
     name: puppet-agent
